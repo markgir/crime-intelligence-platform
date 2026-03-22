@@ -1,50 +1,27 @@
 # Crime Intelligence Platform
 
-## Overview
-The Crime Intelligence Platform is designed to provide a comprehensive solution for crime data analysis and intelligence gathering. It aims to assist law enforcement agencies in making data-driven decisions and improving public safety.
+## Installation
+You can install the Crime Intelligence Platform using the following command:
+
+```bash
+npm install crime-intelligence-platform
+```
 
 ## Features
-- Real-time crime data visualization
-- Crime trend analysis and reporting
-- Predictive analytics for crime prevention
-- API integrations with various data sources
-- User-friendly dashboard for insights and statistics
-
-## Technology Stack
-- **Frontend:** React, Redux, Tailwind CSS
-- **Backend:** Node.js, Express
-- **Database:** MongoDB
-- **Authentication:** JWT, OAuth2
-- **Hosting:** AWS, Docker
-
-## Installation Guide
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/markgir/crime-intelligence-platform.git
-   cd crime-intelligence-platform
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Set up environment variables:
-   Create a `.env` file in the root directory and configure the necessary variables.
-4. Run the application:
-   ```bash
-   npm start
-   ```
+- **Feature 1**: Detailed crime analysis and reporting.
+- **Feature 2**: Real-time updates and notifications.
+- **Feature 3**: User-friendly interface for better data visualization.
 
 ## API Endpoints
-- `GET /api/crimes` - Fetch all crime data
-- `POST /api/crimes` - Add new crime data
-- `GET /api/crimes/:id` - Get detailed information about a specific crime
-- `PUT /api/crimes/:id` - Update crime information
-- `DELETE /api/crimes/:id` - Delete a crime record
+- `GET /api/crimes`: Retrieve a list of crimes.
+- `POST /api/crimes`: Add a new crime report.
+- `GET /api/crimes/{id}`: Get details of a specific crime report.
+- `PUT /api/crimes/{id}`: Update an existing crime report.
+- `DELETE /api/crimes/{id}`: Delete a crime report.
 
-## Development Roadmap
-- **Q1 2026:** Launch MVP and gather user feedback.
-- **Q2 2026:** Implement additional features based on feedback.
-- **Q3 2026:** Expand API integrations with law enforcement databases.
-- **Q4 2026:** Enhance visualization tools and user experience.
-
-For more details, please refer to our [documentation](https://github.com/markgir/crime-intelligence-platform/wiki).
+## Comprehensive Guide
+1. **Setup**: Clone the repository and install dependencies using `npm install`.
+2. **Starting the Server**: Run `npm start` to start the server.
+3. **Interacting with the API**: Use tools like Postman to interact with the API endpoints as described above.
+4. **Contributing**: Please read `CONTRIBUTING.md` for guidelines on contributing to the project.
+5. **License**: See `LICENSE` for licensing details.
