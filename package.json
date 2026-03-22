@@ -1,0 +1,16 @@
+{
+  "name": "crime-intelligence-platform",
+  "version": "1.0.0",
+  "description": "Plataforma Completa de Inteligência Criminal",
+  "scripts": {
+    "start": "pm2 start ecosystem.config.js",
+    "stop": "pm2 stop ecosystem.config.js",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm start",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "build:frontend": "cd frontend && npm run build"
+  },
+  "keywords": ["crime", "intelligence", "osint", "platform"],
+  "author": "markgir",
+  "license": "MIT"
+}
