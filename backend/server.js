@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -51,6 +52,15 @@ app.use('/api/cameras', camerasRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running', timestamp: new Date() });
+});
+
+// Serve frontend static files (production build)
+const frontendBuild = path.join(__dirname, '../frontend/build');
+app.use(express.static(frontendBuild));
+
+// Fallback to index.html for client-side React Router routes (non-API paths only)
+app.get(/^(?!\/api)/, (req, res) => {
+  res.sendFile(path.join(frontendBuild, 'index.html'));
 });
 
 // Error handling middleware
