@@ -102,6 +102,41 @@ install_postgresql() {
     print_ok "PostgreSQL installed."
 }
 
+# ── Ensure PostgreSQL is running ──────────────────────────────────────────────
+ensure_postgresql_running() {
+    # Quick check: can we reach the server?
+    if sudo -u postgres psql -c "SELECT 1;" >/dev/null 2>&1; then
+        return 0
+    fi
+    print_info "PostgreSQL is installed but not running – starting service..."
+    case "$OS" in
+        macos)
+            brew services start postgresql@15 2>/dev/null || \
+            brew services start postgresql 2>/dev/null || true
+            ;;
+        debian|redhat)
+            sudo systemctl start postgresql 2>/dev/null || \
+            sudo service postgresql start 2>/dev/null || \
+            { command -v pg_lsclusters >/dev/null 2>&1 && \
+              PG_VER=$(pg_lsclusters -h 2>/dev/null | awk 'NR==1{print $1}') && \
+              PG_CLUSTER=$(pg_lsclusters -h 2>/dev/null | awk 'NR==1{print $2}') && \
+              [ -n "$PG_VER" ] && [ -n "$PG_CLUSTER" ] && \
+              sudo pg_ctlcluster "$PG_VER" "$PG_CLUSTER" start; } 2>/dev/null || true
+            ;;
+    esac
+    # Wait up to 15 s for PostgreSQL to accept connections
+    local waited=0
+    while [ "$waited" -lt 15 ]; do
+        if sudo -u postgres psql -c "SELECT 1;" >/dev/null 2>&1; then
+            print_ok "PostgreSQL is running."
+            return 0
+        fi
+        sleep 1
+        waited=$((waited + 1))
+    done
+    print_warn "PostgreSQL may not be ready. Continuing anyway..."
+}
+
 # ── Generate a random hex string (safe in all shell/SQL/env contexts) ─────────
 gen_hex() {
     # $1 = number of bytes → $1*2 hex chars
@@ -120,6 +155,7 @@ setup() {
     detect_os
     install_nodejs
     install_postgresql
+    ensure_postgresql_running
 
     # ── 2. npm dependencies ───────────────────────────────────────────────────
     print_step "2/8  Installing Node.js dependencies..."
@@ -144,21 +180,26 @@ setup() {
     # ── 5. Configure PostgreSQL ───────────────────────────────────────────────
     print_step "5/8  Configuring PostgreSQL..."
 
-    # Attempt to set the postgres user's password (best-effort).
-    # DB_PASSWORD is generated with gen_hex (hex chars only) – safe for SQL interpolation.
-    if sudo -n -u postgres psql -c "ALTER USER postgres WITH PASSWORD '$DB_PASSWORD';" >/dev/null 2>&1; then
+    # Try to set the postgres user's password so that TCP/IP connections from the
+    # backend use password auth.  We prefer the peer-auth path (sudo -u postgres)
+    # which works on Debian/Ubuntu without needing a pre-existing password.
+    PG_PASSWORD_SET=""
+    if sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD '$DB_PASSWORD';" >/dev/null 2>&1; then
         print_ok "PostgreSQL password configured."
-        PG_CMD_PREFIX="PGPASSWORD=$DB_PASSWORD"
+        PG_PASSWORD_SET="yes"
+    elif sudo -n -u postgres psql -c "ALTER USER postgres WITH PASSWORD '$DB_PASSWORD';" >/dev/null 2>&1; then
+        print_ok "PostgreSQL password configured."
+        PG_PASSWORD_SET="yes"
     elif PGPASSWORD="$DB_PASSWORD" psql -U postgres -c "SELECT 1;" >/dev/null 2>&1; then
         print_ok "PostgreSQL connection verified with generated password."
-        PG_CMD_PREFIX="PGPASSWORD=$DB_PASSWORD"
+        PG_PASSWORD_SET="yes"
     elif psql -U postgres -c "SELECT 1;" >/dev/null 2>&1; then
         # Trust / peer auth – no password needed; keep DB_PASSWORD for .env but it won't be checked
         print_warn "PostgreSQL using peer/trust auth – DB_PASSWORD in .env is for reference only."
-        PG_CMD_PREFIX=""
+        PG_PASSWORD_SET=""
     else
         print_warn "Could not verify PostgreSQL connection. Check pg_hba.conf and re-run if needed."
-        PG_CMD_PREFIX=""
+        PG_PASSWORD_SET=""
     fi
 
     # ── 6. Write .env files ───────────────────────────────────────────────────
@@ -191,8 +232,9 @@ ENVEOF
     # Helper: run psql as superuser, using the auth method established in step 5.
     # Falls back to sudo -u postgres if password-based auth is unavailable.
     run_psql() {
-        if [ -n "$PG_CMD_PREFIX" ]; then
-            eval "${PG_CMD_PREFIX} psql -U postgres $*"
+        if [ -n "$PG_PASSWORD_SET" ]; then
+            # Use TCP (-h localhost) so that scram-sha-256 / md5 password auth is used.
+            PGPASSWORD="$DB_PASSWORD" psql -U postgres -h localhost "$@"
         else
             psql -U postgres "$@" 2>/dev/null || sudo -u postgres psql "$@"
         fi
@@ -229,7 +271,7 @@ ENVEOF
     # so it is not visible in process listings).
     SEED_OUTPUT=$(cd "$BACKEND_DIR" && SEED_ADMIN_PASSWORD="$ADMIN_PASSWORD" \
         node "$APP_DIR/backend/scripts/seed-admin.js" \
-        "$DEFAULT_USER" "$DEFAULT_EMAIL" 2>&1)
+        "$DEFAULT_USER" "$DEFAULT_EMAIL" 2>&1) || true
     if echo "$SEED_OUTPUT" | grep -q "^OK:"; then
         print_ok "Default admin user created."
     else
