@@ -7,6 +7,13 @@ import VehicleList from './components/Vehicles/VehicleList';
 import CrimeList from './components/Crimes/CrimeList';
 import RelationshipGraph from './components/Relationships/RelationshipGraph';
 import BackupManager from './components/Backups/BackupManager';
+import ImportManager from './components/Import/ImportManager';
+import AlertSystem from './components/Alerts/AlertSystem';
+import PatternAnalysis from './components/Analytics/PatternAnalysis';
+import GeoMap from './components/GeoMap/GeoMap';
+import ReportGenerator from './components/Reports/ReportGenerator';
+import CCTVManager from './components/CCTV/CCTVManager';
+import ExternalAPIs from './components/ExternalAPIs/ExternalAPIs';
 import './App.css';
 
 const PrivateRoute = ({ children }) => {
@@ -22,6 +29,13 @@ const NavBar = ({ onLogout }) => {
     { to: '/vehicles', label: '🚗 Veículos' },
     { to: '/crimes', label: '🚨 Crimes' },
     { to: '/relationships', label: '🔗 Relações' },
+    { to: '/alerts', label: '🔔 Alertas' },
+    { to: '/import', label: '📥 Importar' },
+    { to: '/analytics', label: '🧠 Padrões' },
+    { to: '/geomap', label: '🗺️ Mapa' },
+    { to: '/reports', label: '📄 Relatórios' },
+    { to: '/cameras', label: '📹 CCTV' },
+    { to: '/external-apis', label: '🔌 APIs' },
     { to: '/backups', label: '💾 Backups' },
   ];
   return (
@@ -83,6 +97,13 @@ function App() {
                 <Route path="/crimes" element={<CrimeList />} />
                 <Route path="/relationships" element={<RelationshipGraph />} />
                 <Route path="/backups" element={<BackupManager />} />
+                <Route path="/import" element={<ImportManager />} />
+                <Route path="/alerts" element={<AlertSystem />} />
+                <Route path="/analytics" element={<PatternAnalysis />} />
+                <Route path="/geomap" element={<GeoMap />} />
+                <Route path="/reports" element={<ReportGenerator />} />
+                <Route path="/cameras" element={<CCTVManager />} />
+                <Route path="/external-apis" element={<ExternalAPIs />} />
               </Routes>
             </AppLayout>
           </PrivateRoute>
