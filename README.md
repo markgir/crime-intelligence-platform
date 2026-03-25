@@ -153,33 +153,52 @@ A **Crime Intelligence Platform** é uma solução completa e *production-ready*
 
 ---
 
-## 🚀 Instalação Rápida (Uma Linha)
+## 🚀 Instalação Rápida (Comando Único)
 
-**Linux / macOS:**
+### Linux / macOS – Zero intervenção manual
+
+Clone e execute **um único comando** para instalar todas as dependências do sistema, configurar a base de dados, criar o utilizador administrador padrão e iniciar a aplicação automaticamente:
 
 ```bash
 git clone https://github.com/markgir/crime-intelligence-platform.git && \
   cd crime-intelligence-platform && \
-  npm install && \
-  npm install -g pm2 && \
-  cd backend && npm install && \
-  cd ../frontend && npm install && \
-  echo "✅ Instalação concluída!"
+  bash install.sh setup
 ```
 
-**Windows (PowerShell):**
+No final do processo, o script apresenta as **credenciais padrão** e o endereço da aplicação:
 
-```powershell
-git clone https://github.com/markgir/crime-intelligence-platform.git; `
-  cd crime-intelligence-platform; `
-  npm install; `
-  npm install -g pm2; `
-  cd backend; npm install; `
-  cd ..\frontend; npm install; `
-  Write-Host "✅ Instalação concluída!"
+```
+╔══════════════════════════════════════════════════════════════════╗
+║                  🎉  SETUP COMPLETE!  🎉                        ║
+╠══════════════════════════════════════════════════════════════════╣
+║                                                                  ║
+║  🟢 Server is UP and running.                                    ║
+║                                                                  ║
+║  🌐  API Backend   →  http://localhost:5000                      ║
+║  🌐  Frontend      →  http://localhost:3000  (npm start)         ║
+║                                                                  ║
+║  🔐  Default Admin Credentials                                   ║
+║      Username : admin                                            ║
+║      Password : <automatically generated password>              ║
+║                                                                  ║
+║  ⚠️   IMPORTANT: Change the admin password after first login!    ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
 ```
 
-> ⚠️ Após a instalação, edite `backend/.env` com as suas credenciais de base de dados antes de iniciar os serviços.
+> ⚠️ **Altere a password do administrador após o primeiro login.**
+
+O que o comando `setup` faz automaticamente:
+1. Instala **Node.js** (se não estiver presente)
+2. Instala **PostgreSQL** (se não estiver presente)
+3. Instala todas as dependências npm (backend + frontend)
+4. Compila o frontend para produção
+5. Gera segredos JWT e passwords aleatórias seguras
+6. Cria e configura os ficheiros `.env`
+7. Cria a base de dados e aplica o esquema
+8. Cria o utilizador **admin** padrão
+9. Inicia a aplicação via **PM2** (ou em segundo plano)
+10. Apresenta as credenciais e o URL de acesso
 
 ---
 
