@@ -220,7 +220,7 @@ BACKUP_DIR=./backups
 ENVEOF
 
     cat > "$FRONTEND_DIR/.env" << ENVEOF
-REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_API_URL=/api
 REACT_APP_JWT_STORAGE_KEY=token
 ENVEOF
 
@@ -314,6 +314,11 @@ ENVEOF
         sleep 1
     done
 
+    # Detect the server's LAN IP address for display (Linux and macOS)
+    SERVER_IP=$(hostname -I 2>/dev/null | awk '{print $1}')
+    [ -z "$SERVER_IP" ] && SERVER_IP=$(ipconfig getifaddr en0 2>/dev/null || true)
+    [ -z "$SERVER_IP" ] && SERVER_IP="localhost"
+
     echo ""
     echo "╔══════════════════════════════════════════════════════════════════╗"
     echo "║                  🎉  SETUP COMPLETE!  🎉                        ║"
@@ -325,8 +330,7 @@ ENVEOF
     echo "║  🟡 Server is starting – check logs if it does not respond.      ║"
     fi
     echo "║                                                                  ║"
-    echo "║  🌐  API Backend   →  http://localhost:5000                      ║"
-    echo "║  🌐  Frontend      →  http://localhost:3000  (npm start)         ║"
+    printf  "║  🌐  Open in browser  →  http://%-35s ║\n" "$SERVER_IP:5000"
     echo "║                                                                  ║"
     echo "║  🔐  Default Admin Credentials                                   ║"
     printf  "║      Username : %-49s ║\n" "$DEFAULT_USER"
@@ -378,7 +382,7 @@ EOF
     if [ ! -f "$FRONTEND_DIR/.env" ]; then
         print_step "Creating frontend .env file..."
         cat > "$FRONTEND_DIR/.env" << 'EOF'
-REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_API_URL=/api
 REACT_APP_JWT_STORAGE_KEY=token
 EOF
     fi
