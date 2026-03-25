@@ -2,7 +2,8 @@ module.exports = {
   apps: [
     {
       name: 'crime-intelligence-backend',
-      script: './backend/server.js',
+      script: './server.js',
+      cwd: './backend',
       env: {
         NODE_ENV: 'production',
         PORT: 5000,
