@@ -8,7 +8,16 @@ require('dotenv').config();
 const app = express();
 
 // Middleware
-app.use(helmet());
+// HSTS and Cross-Origin-Opener-Policy are only safe to enable when the app is
+// served over HTTPS.  On plain-HTTP deployments (e.g. a LAN IP without TLS)
+// these headers cause browsers to permanently redirect to https:// and emit
+// "ERR_SSL_PROTOCOL_ERROR".  Set HTTPS_ENABLED=true in the environment when
+// the server is placed behind an HTTPS reverse-proxy.
+const httpsEnabled = process.env.HTTPS_ENABLED === 'true';
+app.use(helmet({
+  hsts: httpsEnabled,
+  crossOriginOpenerPolicy: httpsEnabled,
+}));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
