@@ -29,6 +29,12 @@ const vehiclesRoutes = require('./routes/vehicles');
 const crimesRoutes = require('./routes/crimes');
 const relationshipsRoutes = require('./routes/relationships');
 const backupsRoutes = require('./routes/backups');
+const importRoutes = require('./routes/import');
+const alertsRoutes = require('./routes/alerts');
+const externalApisRoutes = require('./routes/externalApis');
+const analyticsRoutes = require('./routes/analytics');
+const reportsRoutes = require('./routes/reports');
+const camerasRoutes = require('./routes/cameras');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/people', peopleRoutes);
@@ -36,6 +42,12 @@ app.use('/api/vehicles', vehiclesRoutes);
 app.use('/api/crimes', crimesRoutes);
 app.use('/api/relationships', relationshipsRoutes);
 app.use('/api/backups', backupsRoutes);
+app.use('/api/import', importRoutes);
+app.use('/api/alerts', alertsRoutes);
+app.use('/api/external-apis', externalApisRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/reports', reportsRoutes);
+app.use('/api/cameras', camerasRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running', timestamp: new Date() });
